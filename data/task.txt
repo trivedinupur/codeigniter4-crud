@@ -1,0 +1,12 @@
+2020-08-09
+==========
+
+1. There should be a view where Admin can see the Students.
+2. Admin should be able to filter the Students List
+3. Admin can be able to Create new/Add Students
+4. Admin can be able to Update existing Students
+5. Admin  can be able to Delete existing Students 
+6. Need to add validation wherever needed.
+7. Use Bootstrap to make it responsive.
+8. Structurize MySQL DB Structure.
+9. Write Test Cases/Unit Test for 3 - 4 Scenario.
