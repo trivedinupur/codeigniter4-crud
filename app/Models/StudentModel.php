@@ -66,4 +66,21 @@ class StudentModel extends Model
 
         return $query->paginate(2);
     }
+
+    public function saveRecord($data)
+    {
+        $this->setValidationRules($this->validationRules);
+        $this->setValidationMessages($this->validationMessages);
+
+        if ($this->save($data)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function deleteRecord($id)
+    {
+        return $this->delete($id, true);
+    }
 }

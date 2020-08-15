@@ -2,17 +2,18 @@
 namespace App\Controllers;
 
 use App\Models\StudentModel;
-use Config\Services;
 
 class Student extends BaseController
 {
     protected $helpers = ['url', 'form'];
     protected $model = null;
+    protected $validation = null;
+    protected $listingUrl = null;
 
     public function __construct()
     {
         $this->model = new StudentModel();
-        $this->validation = Services::validation();
+        $this->validation = $this->model->validation;
         $this->listingUrl = base_url('student');
     }
 
@@ -46,38 +47,21 @@ class Student extends BaseController
             return view($template, $viewVars);
         }
 
-        $this->validation->reset();
-        $this->validation->setRules(
-            $this->model->getValidationRules(),
-            $this->model->getValidationMessages()
-        );
+        $saved = $this->model->saveRecord($this->request->getPost());
 
-        $isValid = $this->validation->withRequest($this->request)
-           ->run();
-
-        if (!$isValid) {
+        if (!$saved) {
             $viewVars['record'] = $this->request->getPost();
 
             return view($template, $viewVars);
         }
 
-        if ($this->model->save($this->request->getPost())) {
-            $this->session->setFlashdata('success', 'Successfully created record');
-        } else {
-            $this->session->setFlashdata('error', 'Some error occured while saving record');
-        }
+        $this->session->setFlashdata('success', 'Successfully created record');
 
         return redirect()->to($this->listingUrl);
     }
 
-    public function edit($id = null)
+    public function edit($id)
     {
-        if (empty($id)) {
-            $this->session->setFlashdata('error', 'Incomplete url');
-
-            return redirect()->to($this->listingUrl);
-        }
-
         $template = 'student/edit';
 
         $record = $this->model->find($id);
@@ -95,33 +79,22 @@ class Student extends BaseController
             return view($template, $viewVars);
         }
 
-        $this->validation->reset();
-        $this->validation->setRules(
-            $this->model->getValidationRules(),
-            $this->model->getValidationMessages()
-        );
+        $saved = $this->model->saveRecord($this->request->getPost());
 
-        $isValid = $this->validation->withRequest($this->request)
-           ->run();
-
-        if ($isValid) {
-            if ($this->model->save($this->request->getPost())) {
-                $this->session->setFlashdata('success', 'Successfully edited record');
-            } else {
-                $this->session->setFlashdata('error', 'Some error occured while saving record');
-            }
-
-            return redirect()->to($this->listingUrl);
-        } else {
+        if (!$saved) {
             $viewVars['record'] = $this->request->getPost();
+
+            return view($template, $viewVars);
         }
 
-        return view($template, $viewVars);
+        $this->session->setFlashdata('success', 'Successfully edited record');
+
+        return redirect()->to($this->listingUrl);
     }
 
-    public function delete($id = null)
+    public function delete($id)
     {
-        if ($this->model->delete($id)) {
+        if ($this->model->deleteRecord($id)) {
             $this->session->setFlashdata('success', 'Successfully deleted record');
         } else {
             $this->session->setFlashdata('error', 'Could not delete record');
